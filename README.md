@@ -8,13 +8,12 @@ Micro25519 provides a clean and easy-to-use high-level API for X25519 and Ed2551
 
 Micro25519 aims to be fully resistant against timing-based side-channel attacks on the four main target platforms that are supported by Assembly implementations of the field arithmetic. To achieve this, all arithmetic operations in the underlying prime field, except inversion, are written such that they always execute exactly the same sequence of instructions, irrespective of the operands, and therefore have constant execution time. This form of "constant timeness" is also guaranteed by all point-arithmetic operations and the functions for scalar multiplication. The inversion in the prime field is based on the Extended Euclidean Algorithm (EEA), which has operand-dependent execution time, but adopts a simple multiplicative masking technique to thwart timing attacks.
 
-### Tasks and (approximate) project timeline
+### Tasks and (preliminary) project timeline
 
 - Task 1 (mid March): API specification ✔️
 - Task 2 (end April): C implementation of Multi-Precision Integer (MPI) and prime-field arithmetic.
-- Task 3 (mid May): RISC-V Assembly implementation of performance-critical MPI/field operations.
-- Task 4 (end June): AVR Assembly implementation of performance-critical MPI/field operations.
-- Task 5 (mid August): MSP430 Assembly implementation of performance-critical MPI/field operations.
-- Task 6 (end September): ARMv7M Assembly implementation of performance-critical MPI/field operations.
-- Task 7 (mid November): C implementation of the point arithmetic, scalar multiplication, and high-level functions.
-
+- Task 3 (mid June): RISC-V Assembly implementation of performance-critical MPI/field operations.
+- Task 4 (end July): AVR Assembly implementation of performance-critical MPI/field operations.
+- Task 5 (mid September): MSP430 Assembly implementation of performance-critical MPI/field operations.
+- Task 6 (end October): ARMv7M Assembly implementation of performance-critical MPI/field operations.
+- Task 7 (mid December): C implementation of the point arithmetic, scalar multiplication, and high-level functions.
