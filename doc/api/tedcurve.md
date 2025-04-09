@@ -138,7 +138,7 @@ This function checks whether a point $P$ given in affine coordinates satisfies t
 The return value is `0` if $P$ satisfies the curve equation, and `ERR_INVALID_POINT` otherwise.
 
 
-### Computing the "raw" fixed-base comb method: $R = l  \cdot g$
+### Computing the "raw" fixed-base comb method: $R = l  \cdot G$
 
 ```
 void ted_mul_comb4b(Point *r, const Word *l, const ECDomPar *d);
