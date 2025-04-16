@@ -116,7 +116,7 @@ This function doubles a point in extended projective $[X:Y:Z:E:H]$ coordinates.
 Note that `r->dim` must be 6 since the function uses the sixth coordinate of `r` to store an intermediate result of the point doubling (the first five coordinates contain $X$, $Y$, $Z$, $E$, and $H$, respectively).
 
 
-### Checking whether a point has low order: $\mathrm{ord}(P) \stackrel{?}{\geq} 8$
+### Checking whether a point has low order: $\mathrm{ord}(P) \stackrel{?}{>} 8$
 
 ```
 int ted_check_order(Point *r, const Point *p);
@@ -124,7 +124,7 @@ int ted_check_order(Point *r, const Point *p);
 
 This function checks whether a point $P$ given in affine coordinates has low order by computing $R = 8 \cdot P$ through three point doublings and determining whether the $Z$-coordinate of $R$ is 0. Such a check can help prevent certain kinds of side-channel attack that specifically target points of low order.
 
-The return value is `0` if $P$ does not have low order, and `ERR_INVALID_POINT` otherwise (i.e., $P$ has an order of 2, 4, or 8).
+The return value is `0` if $P$ does not have low order, and `ERR_INVALID_POINT` otherwise (i.e., $P$ has an order of 0, 2, 4, or 8).
 
 
 ### Checking whether a point satisfies the curve equation: $-x^2 + y^2 \stackrel{?}{=} d x^2 y^2$

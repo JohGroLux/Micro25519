@@ -93,7 +93,7 @@ This function doubles a point using projective $[X:Z]$ coordinates (i.e., the $Y
 Note that `r->dim` must be 4 since the function uses two coordinates of `r`, namely the second and fourth, to store intermediate results of the point addition (the first and third coordinate contain $X$ and $Z$, respectively).
 
 
-### Checking whether a point has low order: $\mathrm{ord}(P) \stackrel{?}{\geq} 8$
+### Checking whether a point has low order: $\mathrm{ord}(P) \stackrel{?}{>} 8$
 
 ```
 int mon_check_order(Point *r, const Point *p);
