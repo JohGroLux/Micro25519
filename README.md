@@ -10,9 +10,9 @@ Micro25519 aims to be fully resistant against timing-based side-channel attacks 
 
 ### Tasks and (preliminary) project timeline
 
-- Task 1 (mid March): API specification ✔️
+- Task 1 (mid March): API specification. ✔️
 - Task 2 (end April): C implementation of Multi-Precision Integer (MPI) and prime-field arithmetic.
-- Task 3 (mid June): RISC-V Assembly implementation of performance-critical MPI/field operations.
+- Task 3 (mid June): RISC-V Assembly implementation of performance-critical MPI/field operations. ✔️
 - Task 4 (end July): AVR Assembly implementation of performance-critical MPI/field operations.
 - Task 5 (mid September): MSP430 Assembly implementation of performance-critical MPI/field operations.
 - Task 6 (end October): ARMv7M Assembly implementation of performance-critical MPI/field operations.
