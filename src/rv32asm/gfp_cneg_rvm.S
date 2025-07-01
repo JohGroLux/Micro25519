@@ -110,7 +110,7 @@
 .endm
 
 
-// The macro `SUBW_V3` first obtains a bit-mask, which is either 0 (if the LSB
+// The macro `NEGW_V3` first obtains a bit-mask, which is either 0 (if the LSB
 // of parameter `c` is 0) or 0xFFFFFFFF (LSB of parameter `c` is 1), and puts
 // it in register `mask`. Then, the word `a[i]` is loaded from RAM, XORed with
 // `mask`, and the XORed word is added to 0xFFFFFFFC. The double-length result
