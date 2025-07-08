@@ -15,7 +15,7 @@ The table below summarizes the execution time and (binary) code size of each of 
 | Arithmetic Function                  | ASM exec time | ASM code size | C99 exec time | C99 code size |
 | :----------------------------------: | :------------:|:------------: | :-----------: | :-----------: |
 | Addition in $F_p$ (`gfp_add`)        |    93 cycles  |  180 bytes    |  162 cycles   |  90 bytes     |
-| Subtraction in $F_p$ (`gfp_add`)     |   116 cycles  |  234 bytes    |  184 cycles   | 140 bytes     |
+| Subtraction in $F_p$ (`gfp_sub`)     |   116 cycles  |  234 bytes    |  184 cycles   | 140 bytes     |
 | Multiplication in $F_p$ (`gfp_mul`)  |   632 cycles  | 1870 bytes    | 1400 cycles   | 284 bytes     |
 | Squaring in $F_p$ (`gfp_sqr`)        |   477 cycles  | 1340 bytes    | 1023 cycles   | 386 bytes     |
 | Mult. by 32-bit int. (`gfp_mul32`)   |   107 cycles  |  266 bytes    |  228 cycles   | 174 bytes     |
