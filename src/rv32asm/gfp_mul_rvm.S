@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_mul_rvm(uint32_t *r, const uint32_t *a, const uint32_t *b);
+// void gfp_mul_asm(uint32_t *r, const uint32_t *a, const uint32_t *b);
 //
 // Description:
 // ------------
-// The function `gfp_mul_rvm` computes the product $r = a \cdot b \bmod p$ of
+// The function `gfp_mul_asm` computes the product $r = a \cdot b \bmod p$ of
 // two elements $a$ and $b$ of a pseudo-Mersenne prime field. The prime $p$ is
 // the 255-bit pseudo-Mersenne prime $p = 2^{255} - 19$. Operands $a$ and $b$
 // are allowed to be larger than $p$. The result $r$ may not be fully reduced,
@@ -55,6 +55,8 @@
 #define tmp0 a1
 #define tmp1 a2
 #define tmp2 t6
+// Register `rcon` holds the coefficient `c` of prime p
+#define rcon a2
 // Registers `aw00` to `aw07` hold words of operand `a`
 #define aw00 t0
 #define aw01 t1
@@ -229,25 +231,25 @@
 // and an upper part, which is multiplied by $c = 19$ and the obtained product
 // is added to the intermediate result `rw00`-`rw07`. The implementation below
 // merges these steps and performs the modular reduction as follows: (i) `rw15`
-// is multiplied by $2c$ and `rw07` is added to the product (macro `MADD_V3`),
+// is multiplied by $2c$ and `rw07` is added to the product (macro `MADD_V2`),
 // (ii) the obtained product is split into a 31-bit lower part and a (smaller)
 // upper part, which is multiplied by $c = 19$ (macro `MULHIXC`), (iii) the
 // obtained single-word product is taken into account when the remaining words
 // `rw08`-`rw14` are multiplied by $2c$ and added to the words `rw00`-`rw06`.
 
 .macro MODREDP
-    li      tmp1, 2*CCON   // tmp1 = 38
-    MADD_V2 tmp2, rw07, rw15, tmp1, rw07
-    srli    tmp1, tmp1, 1  // tmp1 = 19
-    MULHIXC tmp2, rw07, tmp1, tmp2, rw07
-    slli    tmp1, tmp1, 1  // tmp1 = 38
-    MADD_V3 tmp2, rw00, rw08, tmp1, tmp2, rw00
-    MADD_V3 tmp2, rw01, rw09, tmp1, tmp2, rw01
-    MADD_V3 tmp2, rw02, rw10, tmp1, tmp2, rw02
-    MADD_V3 tmp2, rw03, rw11, tmp1, tmp2, rw03
-    MADD_V3 tmp2, rw04, rw12, tmp1, tmp2, rw04
-    MADD_V3 tmp2, rw05, rw13, tmp1, tmp2, rw05
-    MADD_V3 tmp2, rw06, rw14, tmp1, tmp2, rw06
+    li      rcon, 2*CCON   // rcon = 38
+    MADD_V2 tmp2, rw07, rw15, rcon, rw07
+    srli    rcon, rcon, 1  // rcon = 19
+    MULHIXC tmp2, rw07, rcon, tmp2, rw07
+    slli    rcon, rcon, 1  // rcon = 38
+    MADD_V3 tmp2, rw00, rw08, rcon, tmp2, rw00
+    MADD_V3 tmp2, rw01, rw09, rcon, tmp2, rw01
+    MADD_V3 tmp2, rw02, rw10, rcon, tmp2, rw02
+    MADD_V3 tmp2, rw03, rw11, rcon, tmp2, rw03
+    MADD_V3 tmp2, rw04, rw12, rcon, tmp2, rw04
+    MADD_V3 tmp2, rw05, rw13, rcon, tmp2, rw05
+    MADD_V3 tmp2, rw06, rw14, rcon, tmp2, rw06
     add     rw07, rw07, tmp2 
 .endm
 
@@ -337,10 +339,10 @@
 // the result-array `r` is stored to RAM exactly once.
 
 .text
-.global gfp_mul_rvm
-.type gfp_mul_rvm,%function
+.global gfp_mul_asm
+.type gfp_mul_asm,%function
 // .balign 8
-gfp_mul_rvm:
+gfp_mul_asm:
     PROLOGUE            // push callee-saved registers on stack
     LDM_OPA             // load the eight words of array `a` from RAM
     MULROWS             // row-wise multiplication R += A*b[j]*2^(32*j)

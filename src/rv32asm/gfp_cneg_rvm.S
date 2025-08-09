@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_cneg_rvm(uint32_t *r, const uint32_t *a, int c);
+// void gfp_cneg_asm(uint32_t *r, const uint32_t *a, int c);
 //
 // Description:
 // ------------
-// The function `gfp_cneg_rvm` computes the negative $r = a - b \bmod p$ of an
+// The function `gfp_cneg_asm` computes the negative $r = a - b \bmod p$ of an
 // element $a$ of a pseudo-Mersenne prime field if the LSB of parameter `c` is
 // 1. On the other hand, if the LSB of `c` is 0, the result is $a$. The prime
 // $p$ is the 255-bit pseudo-Mersenne prime $p = 2^{255} - 19$. Operand $a$ is
@@ -168,10 +168,10 @@
 // `r` is stored to RAM exactly once.
 
 .text
-.global gfp_cneg_rvm
-.type gfp_cneg_rvm,%function
+.global gfp_cneg_asm
+.type gfp_cneg_asm,%function
 // .balign 8
-gfp_cneg_rvm:
+gfp_cneg_asm:
     NEGW_V3 cryw, sumw, 28
     li      tmp1, CCON  // tmp1 = 19
     MULHIXC cryw, rmsw, tmp1, cryw, sumw

@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_sub_rvm(uint32_t *r, const uint32_t *a, const uint32_t *b);
+// void gfp_sub_asm(uint32_t *r, const uint32_t *a, const uint32_t *b);
 //
 // Description:
 // ------------
-// The function `gfp_sub_rvm` computes the difference $r = a - b \bmod p$ of
+// The function `gfp_sub_asm` computes the difference $r = a - b \bmod p$ of
 // two elements $a$ and $b$ of a pseudo-Mersenne prime field. The prime $p$ is
 // the 255-bit pseudo-Mersenne prime $p = 2^{255} - 19$. Operands $a$ and $b$
 // are allowed to be larger than $p$. The result $r$ may not be fully reduced,
@@ -168,10 +168,10 @@
 // the result-array `r` is stored to RAM exactly once.
 
 .text
-.global gfp_sub_rvm
-.type gfp_sub_rvm,%function
+.global gfp_sub_asm
+.type gfp_sub_asm,%function
 // .balign 8
-gfp_sub_rvm:
+gfp_sub_asm:
     SUBW_V3 cryw, sumw, 28
     li      tmp1, CCON  // tmp1 = 19
     MULHIXC cryw, rmsw, tmp1, cryw, sumw

@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_hlv_rvm(uint32_t *r, const uint32_t *a);
+// void gfp_hlv_asm(uint32_t *r, const uint32_t *a);
 //
 // Description:
 // ------------
-// The function `gfp_hlv_rvm` computes the half $r = a/2 \bmod p$ of an element
+// The function `gfp_hlv_asm` computes the half $r = a/2 \bmod p$ of an element
 // $a$ of a pseudo-Mersenne prime field. The prime $p$ is the 255-bit pseudo-
 // Mersenne prime $p = 2^{255} - 19$. Operand $a$ is allowed to be larger than
 // $p$. The result $r$ may not be fully reduced, but $r$ is always less than
@@ -141,10 +141,10 @@
 // `r` is stored to RAM exactly once.
 
 .text
-.global gfp_hlv_rvm
-.type gfp_hlv_rvm,%function
+.global gfp_hlv_asm
+.type gfp_hlv_asm,%function
 // .balign 8
-gfp_hlv_rvm:
+gfp_hlv_asm:
     HLVW_V1 bbit, dif0, 0
     HLVW_V2 bbit, dif1, bbit, dif0, 4
     HLVW_V2 bbit, dif0, bbit, dif1, 8

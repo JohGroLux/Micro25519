@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_add_rvm(uint32_t *r, const uint32_t *a, const uint32_t *b);
+// void gfp_add_asm(uint32_t *r, const uint32_t *a, const uint32_t *b);
 //
 // Description:
 // ------------
-// The function `gfp_add_rvm` computes the sum $r = a + b \bmod p$ of two
+// The function `gfp_add_asm` computes the sum $r = a + b \bmod p$ of two
 // elements $a$ and $b$ of a pseudo-Mersenne prime field. The prime $p$ is the
 // 255-bit pseudo-Mersenne prime $p = 2^{255} - 19$. Operands $a$ and $b$ are
 // allowed to be larger than $p$. The result $r$ may not be fully reduced, but
@@ -133,10 +133,10 @@
 // the result-array `r` is stored to RAM exactly once.
 
 .text
-.global gfp_add_rvm
-.type gfp_add_rvm,%function
+.global gfp_add_asm
+.type gfp_add_asm,%function
 // .balign 8
-gfp_add_rvm:
+gfp_add_asm:
     ADDW_V2 cryw, sumw, 28
     li      tmp1, CCON  // tmp1 = 19
     MULHIXC cryw, rmsw, tmp1, cryw, sumw

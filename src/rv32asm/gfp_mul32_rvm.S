@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// void gfp_mul32_rvm(uint32_t *r, const uint32_t *a, const uint32_t *b);
+// void gfp_mul32_asm(uint32_t *r, const uint32_t *a, const uint32_t *b);
 //
 // Description:
 // ------------
-// The function `gfp_mul32_rvm` computes the product $r = a \cdot b \bmod p$ of
+// The function `gfp_mul32_asm` computes the product $r = a \cdot b \bmod p$ of
 // two elements $a$ and $b$ of a pseudo-Mersenne prime field, with element $b$
 // being up to 32 bits long. The prime $p$ is the 255-bit pseudo-Mersenne prime
 // $p = 2^{255} - 19$. Operand $a$ is allowed to be larger than $p$. The result
@@ -169,8 +169,7 @@
 // of the multiplier is loaded to `bw00` via base-address `bptr` and offset 0.
 
 .macro MULROW1
-    // lw      bw00, 0(bptr)
-    mv      bw00, a2
+    lw      bw00, 0(bptr)
     MADD_V1 rw01, rw00, aw00, bw00
     MADD_V2 rw02, rw01, aw01, bw00, rw01
     MADD_V2 rw03, rw02, aw02, bw00, rw02
@@ -243,10 +242,10 @@
 // `r` is stored to RAM exactly once.
 
 .text
-.global gfp_mul32_rvm
-.type gfp_mul32_rvm,%function
+.global gfp_mul32_asm
+.type gfp_mul32_asm,%function
 // .balign 8
-gfp_mul32_rvm:
+gfp_mul32_asm:
     LDM_OPA             // load the eight words of array `a` from RAM
     MULROW1             // row-wise multiplication R = A*b[0]
     MODREDP             // modular reduction: Rlo = (Rlo + Rhi*2*c) mod p

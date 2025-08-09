@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// int mpi_sub_rvm(uint32_t *r, const uint32_t *a, const uint32_t *b, int len);
+// int mpi_sub_asm(uint32_t *r, const uint32_t *a, const uint32_t *b, int len);
 //
 // Description:
 // ------------
-// The function `mpi_sub_rvm` computes the difference $r = a - b$ of two multi-
+// The function `mpi_sub_asm` computes the difference $r = a - b$ of two multi-
 // precision integers $a$ and $b$. Operands $a$ and $b$, as well as the result
 // `r`, have a length of `len` words. Negative results are represented in two's
 // complement form and have a return value of 1.
@@ -75,10 +75,10 @@
 
 
 .text
-.global mpi_sub_rvm
-.type mpi_sub_rvm,%function
+.global mpi_sub_asm
+.type mpi_sub_asm,%function
 // .balign 8
-mpi_sub_rvm:
+mpi_sub_asm:
     mv      bor, zero
 .LLOOP:
     lw      dif, 0(aptr)

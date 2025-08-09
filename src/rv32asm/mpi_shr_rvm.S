@@ -20,11 +20,11 @@
 
 // Function prototype:
 // -------------------
-// int mpi_shr_rvm(uint32_t *r, const uint32_t *a, int len);
+// int mpi_shr_asm(uint32_t *r, const uint32_t *a, int len);
 //
 // Description:
 // ------------
-// The function `mpi_shr_rvm` computes the 1-bit right-shift $r = a >> 1$ of a
+// The function `mpi_shr_asm` computes the 1-bit right-shift $r = a >> 1$ of a
 // multi-precision integer $a$. Operands $a$, as well as the result `r`, have a
 // length of `len` words. The right-shift is a logical shift operations, which
 // means the MSB of result-word `r[len-1]` is always 0.
@@ -73,10 +73,10 @@
 
 
 .text
-.global mpi_shr_rvm
-.type mpi_shr_rvm,%function
+.global mpi_shr_asm
+.type mpi_shr_asm,%function
 // .balign 8
-mpi_shr_rvm:
+mpi_shr_asm:
     lw      old, 0(aptr)
     addi    aptr, aptr, 4
     addi    len, len, -1
