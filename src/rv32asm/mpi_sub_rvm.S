@@ -54,7 +54,7 @@
 #define bptr a2
 // Register `len` holds the word-length of the operands
 #define len a3
-// Registers `tmp1` and `tmp2` hold intermediate results
+// Registers `tmp1` and `tmp2` hold intermediate values
 #define tmp1 a4
 #define tmp2 a5
 // Registers `dif` and `bor` hold difference and borrow

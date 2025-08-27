@@ -43,7 +43,7 @@
 
 
 // Constant c of the pseudo-Mersenne prime: p = 2^k - c
-.equ CCON, 19
+.equ CONSTC, 19
 
 // Register `rptr` holds the start address of array `r`
 #define rptr a0
@@ -55,7 +55,7 @@
 #define tmp0 a1
 #define tmp1 a2
 #define tmp2 t6
-// Register `rcon` holds the coefficient `c` of prime p
+// Register `rcon` holds the constant c of the PM-prime
 #define rcon a2
 // Registers `aw00` to `aw07` hold words of operand `a`
 #define aw00 t0
@@ -105,6 +105,7 @@
 // `c0w` to the product. The double-length result is put in the `rhi:rlo`
 // register-pair.
 // NOTE: Registers `rhi` and `rlo` have to be different from `aiw` and `bjw`.
+// NOTE: Register `c0w` is (generally) the same as register `rlo`.
 
 .macro MADD_V2 rhi:req, rlo:req, aiw:req, bjw:req, c0w:req
     mul     tmp0, \aiw, \bjw
@@ -119,11 +120,13 @@
 // words `c0w` and `d0w` to the product. The double-length result is put in the
 // `rhi:rlo` register-pair.
 // NOTE: Registers `rhi` and `rlo` have to be different from `aiw` and `bjw`.
+// NOTE: Register `c0w` is (generally) the same as register `rlo`, and register
+// `d0w` is (generally) the same as register `rhi`.
 
-.macro MADD_V3 rhi:req, rlo:req, aiw:req, bjw:req, c0w:req, d0w:req
-    add     tmp0, \c0w, \d0w
+.macro MADD_V3 rhi:req, rlo:req, aiw:req, bjw:req, d0w:req, c0w:req
+    add     tmp0, \d0w, \c0w
     mulhu   \rhi, \aiw, \bjw
-    sltu    \rlo, tmp0, \d0w
+    sltu    \rlo, tmp0, \c0w
     add     \rhi, \rhi, \rlo
     mul     \rlo, \aiw, \bjw
     add     \rlo, \rlo, tmp0
@@ -139,19 +142,22 @@
 
 // The macro `MULHIXC` first splits the double-length word in `dhi:dlo` into a
 // 31-bit lower part and an upper part. The lower part is put in `rlo`, while
-// the upper part is multiplied by the constant $c$ and the single-word product
-// is put in `rhi`.
-// NOTE: the bit-length of `dhi` can be up to $32 - \log_2(c) - 1$, e.g., for
+// the upper part is multiplied by the constant $c$ (in register `rcon`) and
+// the single-word product is put in `rhi`.
+// NOTE: The bit-length of `dhi` can be up to $32 - \log_2(c) - 1$, e.g., for
 // $c = 19$, `dhi` can be up to 26 bits long.
+// NOTE: Register `rcon` contains $2c$ instead of $c$ and must, therefore, be
+// halved before the multiplication.
 
-.macro MULHIXC rhi:req, rlo:req, ccw:req, dhi:req, dlo:req
+.macro MULHIXC rhi:req, rlo:req, dhi:req, dlo:req
     srli    tmp0, \dlo, 31
     slli    \rhi, \dhi, 1
     add     \rhi, \rhi, tmp0
+    srli    tmp0, rcon, 1
     slli    \rlo, \dlo, 1
-    mul     \rhi, \rhi, \ccw
+    mul     \rhi, \rhi, tmp0
     srli    \rlo, \rlo, 1
- .endm
+.endm
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,11 +244,9 @@
 // `rw08`-`rw14` are multiplied by $2c$ and added to the words `rw00`-`rw06`.
 
 .macro MODREDP
-    li      rcon, 2*CCON   // rcon = 38
+    li      rcon, 2*CONSTC  // rcon = 38
     MADD_V2 tmp2, rw07, rw15, rcon, rw07
-    srli    rcon, rcon, 1  // rcon = 19
-    MULHIXC tmp2, rw07, rcon, tmp2, rw07
-    slli    rcon, rcon, 1  // rcon = 38
+    MULHIXC tmp2, rw07, tmp2, rw07
     MADD_V3 tmp2, rw00, rw08, rcon, tmp2, rw00
     MADD_V3 tmp2, rw01, rw09, rcon, tmp2, rw01
     MADD_V3 tmp2, rw02, rw10, rcon, tmp2, rw02
@@ -250,7 +254,7 @@
     MADD_V3 tmp2, rw04, rw12, rcon, tmp2, rw04
     MADD_V3 tmp2, rw05, rw13, rcon, tmp2, rw05
     MADD_V3 tmp2, rw06, rw14, rcon, tmp2, rw06
-    add     rw07, rw07, tmp2 
+    add     rw07, rw07, tmp2
 .endm
 
 

@@ -44,17 +44,19 @@
 
 
 // Constant c of the pseudo-Mersenne prime: p = 2^k - c
-.equ CCON, 19
+.equ CONSTC, 19
 
 // Register `rptr` holds the start address of array `r`
 #define rptr a0
 // Register `aptr` holds the start address of array `a`
 #define aptr a1
-// Register `mask` holds a mask for conditional negation
+// Register `mask` holds a mask that is 0 or 0xFFFFFFFF
 #define mask a2
-// Registers `tmp0` and `tmp1` hold intermediate results
+// Registers `tmp0` and `tmp1` hold temporary variables
 #define tmp0 a3
 #define tmp1 a4
+// Register `rcon` holds the constant c of the PM-prime
+#define rcon a4
 // Registers `sumw` and `cryw` hold sum and carry words
 #define sumw a5
 #define cryw a6
@@ -67,28 +69,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-// The macro `NEGW_V1` loads the word `a[i]` from RAM, XORs it with `mask` (0
-// or 0xFFFFFFFF), and adds the XORed word to an incoming carry in `cin` (which
-// is non-negative). Then, the constants $2c$ and $2c - 1$ are subtracted from
-// the sum (the latter is ANDed with `mask` before the subtraction is carried
-// out). The double-length result is put in the `shi:slo` register-pair. This
-// result can be negative, whereby the upper word (in `shi`) is always in the
-// range $[-1, 1]$. The lower word of the result is stored in `r[i]` in RAM.
-// NOTE: Register `slo` has to be different from `cin`.
+// The macro `NEGW_V1` first obtains a bit-mask, which is either 0 (if the LSB
+// of parameter `c` is 0) or 0xFFFFFFFF (LSB of parameter `c` is 1), and puts
+// it in register `mask`. Then, the word `a[i]` is loaded from RAM, XORed with
+// `mask`, and the XORed word is added to 0xFFFFFFFC. The double-length result
+// is put in the `shi:slo` register-pair. This result is always positive,
+// whereby the upper word (in `shi`) is in the range [0, 1].
 
-.macro NEGW_V1 shi:req, slo:req, ccw:req, cin:req, i:req
-    slli    \ccw, \ccw, 1
-    addi    tmp0, \ccw, -1
-    and     tmp0, tmp0, mask
-    add     tmp1, \ccw, tmp0
-    lw      \slo, \i(aptr)
-    sltu    tmp0, \cin, tmp1
-    sub     tmp1, \cin, tmp1
-    xor     \slo, \slo, mask
-    add     \slo, \slo, tmp1
-    sltu    \shi, \slo, tmp1
-    sub     \shi, \shi, tmp0
-    sw      \slo, \i(rptr)
+.macro NEGW_V1 shi:req, slo:req, i:req
+    lw      tmp0, \i(aptr)
+    andi    mask, mask, 1
+    sub     mask, zero, mask
+    xor     tmp0, tmp0, mask
+    addi    \slo, tmp0, -4
+    sltu    \shi, \slo, tmp0
 .endm
 
 
@@ -101,7 +95,7 @@
 
 .macro NEGW_V2 shi:req, slo:req, cin:req, i:req
     lw      \slo, \i(aptr)
-    srai    tmp0, \cin, 1
+    srai    tmp0, \cin, 31
     xor     \slo, \slo, mask
     add     \slo, \slo, \cin
     sltu    \shi, \slo, \cin
@@ -110,28 +104,11 @@
 .endm
 
 
-// The macro `NEGW_V3` first obtains a bit-mask, which is either 0 (if the LSB
-// of parameter `c` is 0) or 0xFFFFFFFF (LSB of parameter `c` is 1), and puts
-// it in register `mask`. Then, the word `a[i]` is loaded from RAM, XORed with
-// `mask`, and the XORed word is added to 0xFFFFFFFC. The double-length result
-// is put in the `shi:slo` register-pair. This result is always positive,
-// whereby the upper word (in `shi`) is in the range [0, 1].
-
-.macro NEGW_V3 shi:req, slo:req, i:req
-    lw      tmp0, \i(aptr)
-    andi    mask, mask, 1
-    sub     mask, zero, mask
-    xor     tmp0, tmp0, mask
-    addi    \slo, tmp0, -4
-    sltu    \shi, \slo, tmp0
-.endm
-
-
-// The macro `NEGW_V4` adds the word `cin` along with 4 to `sum` and stores the
+// The macro `NEGW_V3` adds the word `cin` along with 4 to `sum` and stores the
 // result in `r[i]` in RAM. 
 // NOTE: the bit-length of `sum` and `cin` can be up to 31.
 
-.macro NEGW_V4 sum:req, cin:req, i:req
+.macro NEGW_V3 sum:req, cin:req, i:req
     add     \sum, \sum, \cin
     addi    \sum, \sum, 4
     sw      \sum, \i(rptr)
@@ -140,19 +117,28 @@
 
 // The macro `MULHIXC` first splits the double-length word in `dhi:dlo` into a
 // 31-bit lower part and an upper part. The lower part is put in `rlo`, while
-// the upper part is multiplied by the constant $c = 19$ and the single-word
-// product is put in `rhi`.
+// the upper part is multiplied by the constant $c$ (in register `rcon`) and
+// the single-word product is put in `rhi`. Furthermore, the constants $2c$ and
+// $2c - 1$ are subtracted from the product, whereby the the latter constant is
+// ANDed with `mask` before the subtraction is actually carried out. The final
+// result is signed and can, therefore, be negative.
 // NOTE: the bit-length of `dhi` can be up to $32 - \log_2(c) - 1$, e.g., for
 // $c = 19$, `dhi` can be up to 26 bits long.
 
-.macro MULHIXC rhi:req, rlo:req, ccw:req, dhi:req, dlo:req
+.macro MULHIXC rhi:req, rlo:req, dhi:req, dlo:req
+    li      rcon, CONSTC  // rcon = 19
     srli    tmp0, \dlo, 31
     slli    \rhi, \dhi, 1
-    add     \rhi, \rhi, tmp0
+    or      \rhi, \rhi, tmp0
+    addi    \rhi, \rhi, -2
+    andi    tmp0, mask, 2
+    sub     \rhi, \rhi, tmp0
     slli    \rlo, \dlo, 1
-    mul     \rhi, \rhi, \ccw
     srli    \rlo, \rlo, 1
- .endm
+    mul     \rhi, \rhi, rcon
+    srli    tmp0, tmp0, 1
+    add     \rhi, \rhi, tmp0
+.endm
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,17 +158,16 @@
 .type gfp_cneg_asm,%function
 // .balign 8
 gfp_cneg_asm:
-    NEGW_V3 cryw, sumw, 28
-    li      tmp1, CCON  // tmp1 = 19
-    MULHIXC cryw, rmsw, tmp1, cryw, sumw
-    NEGW_V1 cryw, sumw, tmp1, cryw, 0
+    NEGW_V1 cryw, sumw, 28
+    MULHIXC cryw, rmsw, cryw, sumw
+    NEGW_V2 cryw, sumw, cryw, 0
     NEGW_V2 cryw, sumw, cryw, 4
     NEGW_V2 cryw, sumw, cryw, 8
     NEGW_V2 cryw, sumw, cryw, 12
     NEGW_V2 cryw, sumw, cryw, 16
     NEGW_V2 cryw, sumw, cryw, 20
     NEGW_V2 cryw, sumw, cryw, 24
-    NEGW_V4 rmsw, cryw, 28
+    NEGW_V3 rmsw, cryw, 28
     ret
 
 

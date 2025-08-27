@@ -42,18 +42,20 @@
 
 
 // Constant c of the pseudo-Mersenne prime: p = 2^k - c
-.equ CCON, 19
+.equ CONSTC, 19
 
 // Register `rptr` holds the start address of array `r`
 #define rptr a0
 // Register `aptr` holds the start address of array `a`
 #define aptr a1
-// Register `mask` holds a mask for the addition of $p$
+// Register `mask` holds a mask that is 0 or 0xFFFFFFFF
 #define mask a2
-// Registers `tmp0` and `tmp1` hold intermediate results
+// Registers `tmp0` and `tmp1` hold temporary variables
 #define tmp0 a3
 #define tmp1 a4
-// Registers `dif0` and `dif1` hold two difference words
+// Register `rcon` holds the constant c of the PM-prime
+#define rcon a4
+// Registers `dif0` and `dif1` hold subtraction results
 #define dif0 a5
 #define dif1 a6
 // Registers `bbit` holds the borrow-bit of subtraction
@@ -73,12 +75,12 @@
 
 .macro HLVW_V1 bbo:req, dif:req, i:req
     lw      \dif, \i(aptr)
-    li      tmp0, CCON
-    andi    tmp1, \dif, 1
-    sub     mask, zero, tmp1
-    and     tmp0, tmp0, mask
-    sltu    \bbo, \dif, tmp0
-    sub     \dif, \dif, tmp0
+    li      rcon, CONSTC  // rcon = 10
+    andi    tmp0, \dif, 1
+    sub     mask, zero, tmp0
+    and     rcon, rcon, mask
+    sltu    \bbo, \dif, rcon
+    sub     \dif, \dif, rcon
 .endm
 
 

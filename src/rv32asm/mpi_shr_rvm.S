@@ -51,7 +51,7 @@
 #define aptr a1
 // Register `len` holds the word-length of the operands
 #define len a2
-// Register `tmp` holds an intermediate/temporary result
+// Register `tmp` holds a temporary/intermediate result
 #define tmp a3
 // Registers `dif` and `bor` hold difference and borrow
 #define cur a4
