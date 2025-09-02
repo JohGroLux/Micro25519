@@ -161,7 +161,7 @@ int test_gfp_sub(const char *tvname)
     mpi_from_hex(op1, &(buffer[1*MAXLINE]), LEN);
     mpi_from_hex(op2, &(buffer[2*MAXLINE]), LEN);
     // execute the arithmetic operation
-    gfp_sub_v2(res, op1, op2);
+    gfp_sub(res, op1, op2);
     // check result and report mismatch
     wrongtv += chk_vector(o1c, o2c, exp, res);
     numtv++;
@@ -339,7 +339,7 @@ int test_gfp_hlv(const char *tvname)
     // extract operands from testvector
     mpi_from_hex(op1, &(buffer[1*MAXLINE]), LEN);
     // execute the arithmetic operation
-    gfp_hlv_v2(res, op1);
+    gfp_hlv(res, op1);
     // check result and report mismatch
     wrongtv += chk_vector(o1c, NULL, exp, res);
     numtv++;
@@ -383,7 +383,7 @@ int test_gfp_cneg(const char *tvname)
     // extract operands from testvector
     mpi_from_hex(op1, &(buffer[1*MAXLINE]), LEN);
     // execute the arithmetic operation
-    gfp_cneg_v2(res, op1, (numtv & 1));
+    gfp_cneg(res, op1, (numtv & 1));
     // check result and report mismatch
     wrongtv += chk_vector(o1c, NULL, exp, res);
     numtv++;
