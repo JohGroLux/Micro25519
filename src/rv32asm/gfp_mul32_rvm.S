@@ -51,12 +51,11 @@
 #define aptr a1
 // Register `bptr` holds the start address of array `b`
 #define bptr a2
-// Registers `tmp0` to `tmp2` hold intermediate results
+// Registers `tmp0` and `tmp1` hold temporary variables
 #define tmp0 a1
 #define tmp1 a2
-#define tmp2 a3
 // Register `rcon` holds the constant c of the PM-prime
-#define rcon a1
+#define rcon a3
 // Registers `aw00` to `aw07` hold words of operand `a`
 #define aw00 a6
 #define aw01 a7
@@ -67,7 +66,7 @@
 #define aw06 t4
 #define aw07 t5
 // Register `bw00` holds the single word of operand `b`
-#define bw00 t6
+#define bw00 a3
 // Registers `rw00` to `rw08` hold words of the product
 #define rw00 a4
 #define rw01 a5
@@ -78,6 +77,8 @@
 #define rw06 t2
 #define rw07 t3
 #define rw08 t4
+// Register `mask` holds a mask that is 0 or 0xFFFFFFFF
+#define mask t6
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,16 +126,16 @@
 
 .macro MULHIXC rhi:req, rlo:req, msw:req, dhi:req, dlo:req
     li      rcon, CONSTC  // rcon = 19
-    srli    \rlo, \dlo, 31
-    sub     \rlo, zero, \rlo
-    and     \rlo, \rlo, rcon
+    srli    mask, \dlo, 31
+    sub     mask, zero, mask
+    and     mask, mask, rcon
     slli    rcon, rcon, 1
     slli    \msw, \dlo, 1
     mulhu   \rhi, \dhi, rcon
-    mul     tmp0, \dhi, rcon
-    add     \rlo, \rlo, tmp0
-    sltu    tmp0, \rlo, tmp0
-    add     \rhi, \rhi, tmp0
+    mul     \rlo, \dhi, rcon
+    add     \rlo, \rlo, mask
+    sltu    mask, \rlo, mask
+    add     \rhi, \rhi, mask
     srli    \msw, \msw, 1
 .endm
 
@@ -194,8 +195,8 @@
 // length product is added to the eight words `rw00`-`rw07` (macro `ADDWORD`).
 
 .macro MODREDP
-    MULHIXC tmp2, tmp1, rw07, rw08, rw07
-    ADDWORD tmp2, tmp1
+    MULHIXC tmp1, tmp0, rw07, rw08, rw07
+    ADDWORD tmp1, tmp0
 .endm
 
 

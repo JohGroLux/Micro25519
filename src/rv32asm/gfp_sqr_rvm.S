@@ -48,38 +48,37 @@
 #define rptr a0
 // Register `aptr` holds the start address of array `a`
 #define aptr a1
-// Registers `tmp0` to `tmp2` hold intermediate results
-#define tmp0 a1
-#define tmp1 a2
-#define tmp2 t6
+// Registers `tmp0` and `tmp1` hold temporary variables
+#define tmp0 s0
+#define tmp1 s1
 // Register `rcon` holds the constant c of the PM-prime
-#define rcon a2
+#define rcon s2
 // Registers `aw00` to `aw07` hold words of operand `a`
-#define aw00 t0
-#define aw01 t1
-#define aw02 t2
-#define aw03 s0
-#define aw04 s1
-#define aw05 a3
-#define aw06 a4
-#define aw07 a5
-// Registers `rw00` to `rw15` hold words of the square
-#define rw00 a6
-#define rw01 a7
-#define rw02 s2
-#define rw03 s3
-#define rw04 s4
-#define rw05 s5
-#define rw06 s6
-#define rw07 s7
-#define rw08 s8
-#define rw09 s9
-#define rw10 s10
-#define rw11 s11
-#define rw12 t3
-#define rw13 t4
-#define rw14 t5
-#define rw15 t6
+#define aw00 s2
+#define aw01 s3
+#define aw02 s4
+#define aw03 s5
+#define aw04 s6
+#define aw05 s7
+#define aw06 s8
+#define aw07 s9
+// Registers `rw00` to `rw15` hold words of the product
+#define rw00 s10
+#define rw01 s11
+#define rw02 a3
+#define rw03 a4
+#define rw04 a5
+#define rw05 a6
+#define rw06 a7
+#define rw07 t0
+#define rw08 t1
+#define rw09 t2
+#define rw10 t3
+#define rw11 t4
+#define rw12 t5
+#define rw13 t6
+#define rw14 a1
+#define rw15 a2
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -399,16 +398,16 @@
 
 .macro MODREDP
     li      rcon, 2*CONSTC  // rcon = 38
-    MADD_V2 tmp2, rw07, rw15, rcon, rw07
-    MULHIXC tmp2, rw07, tmp2, rw07
-    MADD_V3 tmp2, rw00, rw08, rcon, tmp2, rw00
-    MADD_V3 tmp2, rw01, rw09, rcon, tmp2, rw01
-    MADD_V3 tmp2, rw02, rw10, rcon, tmp2, rw02
-    MADD_V3 tmp2, rw03, rw11, rcon, tmp2, rw03
-    MADD_V3 tmp2, rw04, rw12, rcon, tmp2, rw04
-    MADD_V3 tmp2, rw05, rw13, rcon, tmp2, rw05
-    MADD_V3 tmp2, rw06, rw14, rcon, tmp2, rw06
-    add     rw07, rw07, tmp2
+    MADD_V2 tmp1, rw07, rw15, rcon, rw07
+    MULHIXC tmp1, rw07, tmp1, rw07
+    MADD_V3 tmp1, rw00, rw08, rcon, tmp1, rw00
+    MADD_V3 tmp1, rw01, rw09, rcon, tmp1, rw01
+    MADD_V3 tmp1, rw02, rw10, rcon, tmp1, rw02
+    MADD_V3 tmp1, rw03, rw11, rcon, tmp1, rw03
+    MADD_V3 tmp1, rw04, rw12, rcon, tmp1, rw04
+    MADD_V3 tmp1, rw05, rw13, rcon, tmp1, rw05
+    MADD_V3 tmp1, rw06, rw14, rcon, tmp1, rw06
+    add     rw07, rw07, tmp1
 .endm
 
 

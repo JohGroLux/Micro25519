@@ -16,8 +16,8 @@ The table below summarizes the execution time and (binary) code size of each of 
 | :----------------------------------: | :------------:|:------------: | :-----------: | :-----------: |
 | Addition in $F_p$ (`gfp_add`)        |    93 cycles  |  180 bytes    |  162 cycles   |  90 bytes     |
 | Subtraction in $F_p$ (`gfp_sub`)     |   113 cycles  |  256 bytes    |  184 cycles   | 140 bytes     |
-| Multiplication in $F_p$ (`gfp_mul`)  |   631 cycles  | 1870 bytes    | 1400 cycles   | 284 bytes     |
-| Squaring in $F_p$ (`gfp_sqr`)        |   476 cycles  | 1340 bytes    | 1023 cycles   | 386 bytes     |
+| Multiplication in $F_p$ (`gfp_mul`)  |   631 cycles  | 1860 bytes    | 1400 cycles   | 284 bytes     |
+| Squaring in $F_p$ (`gfp_sqr`)        |   476 cycles  | 1344 bytes    | 1023 cycles   | 386 bytes     |
 | Mult. by 32-bit int. (`gfp_mul32`)   |   107 cycles  |  268 bytes    |  228 cycles   | 174 bytes     |
 | Cond. negation in $F_p$ (`gfp_cneg`) |    86 cycles  |  192 bytes    |  153 cycles   | 124 bytes     |
 | Halving in $F_p$ (`gfp_hlv`)         |   115 cycles  |  200 bytes    |  219 cycles   | 128 bytes     |

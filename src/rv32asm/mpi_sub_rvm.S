@@ -54,9 +54,9 @@
 #define bptr a2
 // Register `len` holds the word-length of the operands
 #define len a3
-// Registers `tmp1` and `tmp2` hold intermediate values
-#define tmp1 a4
-#define tmp2 a5
+// Registers `tmp0` and `tmp1` hold temporary variables
+#define tmp0 a4
+#define tmp1 a5
 // Registers `dif` and `bor` hold difference and borrow
 #define dif a6
 #define bor a7
@@ -82,14 +82,14 @@ mpi_sub_asm:
     mv      bor, zero
 .LLOOP:
     lw      dif, 0(aptr)
-    lw      tmp1, 0(bptr)
+    lw      tmp0, 0(bptr)
     addi    aptr, aptr, 4
     addi    bptr, bptr, 4
-    sltu    tmp2, dif, tmp1
-    sub     dif, dif, tmp1
-    sltu    tmp1, dif, bor
+    sltu    tmp1, dif, tmp0
+    sub     dif, dif, tmp0
+    sltu    tmp0, dif, bor
     sub     dif, dif, bor
-    add     bor, tmp1, tmp2
+    add     bor, tmp0, tmp1
     addi    len, len, -1
     sw      dif, 0(rptr)
     addi    rptr, rptr, 4
